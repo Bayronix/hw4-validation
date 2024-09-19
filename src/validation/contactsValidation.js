@@ -1,7 +1,12 @@
 import Joi from 'joi';
 
 const validateScheme = Joi.object({
-  name: Joi.string().min(3).max(30).required().messages({
+  id: Joi.string().length(24).required().messages({
+    'string.base': '"ID" should be a text',
+    'string.length': '"ID" must be exactly 24 characters',
+    'any.required': '"ID" is a required field',
+  }),
+  name: Joi.string().min(3).max(20).required().messages({
     'string.base': '"Name" should be a text',
     'string.empty': '"Name" cannot be empty',
     'string.min': '"Name" should have at least 3 characters',
