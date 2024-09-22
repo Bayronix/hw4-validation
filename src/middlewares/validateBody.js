@@ -8,9 +8,11 @@ const validateBody = (schema) => {
       });
       next();
       console.log('validation is success');
-    } catch (error) {
-      const validateError = createHttpError(400, error.message);
-      next(validateError);
+    } catch (err) {
+      const error = createHttpError(400, 'Bad Request', {
+        errors: err.details,
+      });
+      next(error);
     }
   };
 
