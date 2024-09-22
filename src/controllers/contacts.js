@@ -79,15 +79,17 @@ export const getDeleteContactController = async (req, res, next) => {
 };
 
 export const getStudentsController = async (req, res) => {
-  const { page, perPage } = parsePaginationParams(req.query);
-  const contacts = await contactServices.getContactsPagination({
-    page,
+  const { perPage, page } = parsePaginationParams(req.query);
+  const { _id: userId } = req.user;
+  const data = await contactServices.getAllContacts({
     perPage,
+    page,
+    filter: { userId },
   });
 
   res.json({
     status: 200,
-    message: 'Successfully found students!',
-    data: contacts,
+    message: 'Successfully found contacts',
+    data,
   });
 };
