@@ -1,10 +1,32 @@
 import ContactCollection from '../db/Contacts.js';
 import { calculatePaginationData } from '../utils/calculatePaginationData.js';
 
-export const getAllContacts = async () => {
-  const contacts = await ContactCollection.find();
-  return contacts;
+export const getAllContacts = async ({
+  page = 1,
+  perPage = 10,
+  sortBy,
+  sortOrder,
+  filter,
+}) => {
+  const limit = perPage;
+  const skip = (page - 1) * perPage;
+
+  const contactsQuery = ContactCollection.find(filter).sort({
+    [sortBy]: sortOrder === 'desc' ? -1 : 1,
+  });
+
+  const contactsCount = await ContactCollection.countDocuments(filter);
+
+  const contacts = await contactsQuery.skip(skip).limit(limit).exec();
+
+  const paginationData = calculatePaginationData(contactsCount, perPage, page);
+
+  return {
+    data: contacts,
+    ...paginationData,
+  };
 };
+
 export const getContactById = async (id) => {
   const contacts = await ContactCollection.findById(id);
   return contacts;
@@ -23,25 +45,6 @@ export const updateContact = async (filter, data, options = {}) => {
   return {
     data: rawResult.value,
     isNew: Boolean(rawResult?.lastErrorObject?.upserted),
-  };
-};
-
-export const getContactsPagination = async ({ page, perPage }) => {
-  const limit = perPage;
-  const skip = (page - 1) * perPage;
-
-  const contactsQuery = ContactCollection.find();
-  const contactsCount = await ContactCollection.find()
-    .merge(contactsQuery)
-    .countDocuments();
-
-  const contacts = await contactsQuery.skip(skip).limit(limit).exec();
-
-  const paginationData = calculatePaginationData(contactsCount, perPage, page);
-
-  return {
-    data: contacts,
-    ...paginationData,
   };
 };
 
